@@ -5,7 +5,7 @@ class Connexion :
     __PWD = 'example'
     __HOST = 'localhost'
     __PORT = '3307'
-    __DB = 'exemple'
+    __DB = 'poo'
     __cursor = None
     __bdd = None
 
