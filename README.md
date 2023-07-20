@@ -1,14 +1,17 @@
 # livreheros_poo
 Le Livre du Héros en POO
-ROLES:
-3role barbare / heal / analiste
 
-barbare : force / resistance
-heal : hp de base / heal
-analiste : % de crit / % trouvé un tresore
+##### RÔLES:
+3 rôles : 
+- Barbare (force / résistance)
+- Healer (+ de HP de base / fonction de heal)
+- Analyste (% de coup crit / % de chance en + de trouver un trésor)
 
-SALLES:
+##### SALLES:
 de 4 a 6 salles avec :
-au choix : enemeie= combat / un feu= boost de state /un des autre role = donne boost de state du roles 
-a chaque fois ,% de chance qu'il y ait un tresore et un % de chance que le presonage prenne le tresore
-salle final = combat contre l'un des role (qui n'est pas celui du joueur ni de la rencontre)
+Au choix : 
+- Ennemi = combat
+- Un feu = boost de stats 
+- Un des autres rôles = donne boost de stase du rôle 
+- Salle finale (boss) = combat contre l'un des rôles (qui n'est pas celui du joueur ni de la rencontre)
+A chaque fois, % de chance qu'il y ait un trésor et un % de chance que le personnage prenne le trésor
