@@ -1,5 +1,5 @@
 import random
-
+from potion import Potion
 class Salle:
     def __init__(self, nom, description):
         self.nom = nom
@@ -11,6 +11,25 @@ class Salle:
     def entrer(self, joueur):
         print("\nVous entrez dans la salle :", self.nom)
         print(self.description)
+
+    def __potion_random__(self,joueur,pourcentage):
+        # par exemple : 0.3 = 30% de chances de trouver une potion
+        if random.random() < pourcentage :           
+            liste_bonus = ["bonus_attaque","bonus_vie","bonus_defense","bonus_chance_critique"]
+            random_bonus = random.choice(liste_bonus)
+            chiffre_random = 0
+            match random_bonus:
+                case "bonus_attaque":
+                    chiffre_random = random.randint(5,15)
+                case "bonus_vie":
+                    chiffre_random = random.randint(10,30)
+                case "bonus_defense":
+                    chiffre_random = random.randint(2,10)
+                case "bonus_chance_critique":
+                    chiffre_random = random.randint(1,10)          
+            potion = Potion("Potion magique",random_bonus=chiffre_random)
+            print(f"Vous trouvez une potion magique de {random_bonus} qui vous augmente de {chiffre_random} points.")
+            potion.utiliser(joueur, bonus_type=random_bonus)
 
 class SallePieges(Salle):
     def __init__(self, nom, description):
@@ -28,6 +47,7 @@ class SallePieges(Salle):
                 joueur.points_de_vie -= 10
         else:
             print("Vous décidez de contourner prudemment les pièges.")
+        super().__potion_random__(joueur,random.random() < 0.3)
         print("")
 
 class SalleTresor(Salle):
@@ -43,6 +63,7 @@ class SalleTresor(Salle):
             print(f"Vous trouvez un coffre rempli de richesses ! Votre attaque augmente de {tresor} points.")
         else:
             print("Vous décidez de ne pas ouvrir le coffre.")
+        super().__potion_random__(joueur,random.random() < 0.3)
         print("")
 
 class SalleFeuDeCamp(Salle):
@@ -103,7 +124,7 @@ class SalleFeuDeCamp(Salle):
         elif isinstance(aventurier_rencontre, Analyste):
             joueur.points_de_defense += 5
             joueur.chance_de_crit += 10
-
+        super().__potion_random__(joueur,random.random() < 0.3)
         print("")
 
 class SalleCombat(Salle):
@@ -126,6 +147,7 @@ class SalleCombat(Salle):
                 joueur.points_de_vie -= 30
         else:
             print("Vous décidez de fuir le combat.")
+        super().__potion_random__(joueur,random.random() < 0.3)
         print("")
 
 class Donjon:
