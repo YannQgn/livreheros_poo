@@ -1,13 +1,13 @@
 # livreheros_poo
 Le Livre du Héros en POO
 
-##### RÔLES:
+#### RÔLES:
 3 rôles : 
 - Barbare (force / résistance)
 - Healer (+ de HP de base / fonction de heal)
 - Analyste (% de coup crit / % de chance en + de trouver un trésor)
 
-##### SALLES:
+#### SALLES:
 de 4 a 6 salles avec :
 Au choix : 
 - Ennemi = combat

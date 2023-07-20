@@ -13,7 +13,7 @@ class Salle:
         print(self.description)
 
     def __potion_random__(self,joueur,pourcentage):
-        # par exemple : 0.3 = 30% de chances de trouver une potion
+        # par exemple: 0.3 = 30% de chances de trouver une potion
         if random.random() < pourcentage :           
             liste_bonus = ["bonus_attaque","bonus_vie","bonus_defense","bonus_chance_critique"]
             random_bonus = random.choice(liste_bonus)
