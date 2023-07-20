@@ -106,6 +106,28 @@ class SalleFeuDeCamp(Salle):
 
         print("")
 
+class SalleCombat(Salle):
+    def __init__(self, nom, description):
+        super().__init__(nom, description)
+
+    def entrer(self, joueur):
+        print("\nVous entrez dans la salle :", self.nom)
+        print(self.description)
+        # Implémentez la logique spécifique à la salle de combat
+        ennemi = "Dragon"  # Remplacez par le nom de l'ennemi approprié
+        print(f"Un {ennemi} redoutable vous attaque !")
+        choix = input("Voulez-vous combattre l'ennemi ? (Oui/Non) : ")
+        if choix.lower() == "oui":
+            reussite = random.random() < 0.7  # 70% de chance de réussite
+            if reussite:
+                print(f"Bravo ! Vous avez vaincu le {ennemi}.")
+            else:
+                print(f"Le {ennemi} était trop puissant pour vous. Vous subissez des dégâts.")
+                joueur.points_de_vie -= 30
+        else:
+            print("Vous décidez de fuir le combat.")
+        print("")
+
 class Donjon:
     def __init__(self):
         self.salles = []
@@ -118,7 +140,8 @@ class Donjon:
         liste_salles = [
             SallePieges("Salle des pièges", "Vous êtes entouré de pièges mortels."),
             SalleTresor("Salle du trésor", "Vous trouvez un trésor rempli de richesses."),
-            SalleFeuDeCamp("Salle feu de camp", "Vous rencontrez un aventurier.")
+            SalleFeuDeCamp("Salle feu de camp", "Vous rencontrez un aventurier."),
+            SalleCombat ("Salle des montres", "Vous tombé sur un groupe de monstre")
             # Ajouter d'autres salles selon vos besoins
         ]
 
