@@ -143,10 +143,17 @@ class SalleFeuDeCamp(Salle):
     def rencontrer_aventurier(self, joueur):
         aventuriers_possibles = [Barbare, Healer, Analyste]
         if isinstance(joueur, Healer):
-            # Si le joueur est un Healer, on exclut la possibilité de rencontrer un autre Healer
             aventuriers_possibles.remove(Healer)
-        aventurier = random.choice(aventuriers_possibles)
-        return aventurier
+        elif isinstance(joueur, Barbare):
+            aventuriers_possibles.remove(Barbare)
+        elif isinstance(joueur, Analyste):
+            aventuriers_possibles.remove(Analyste)
+
+        if aventuriers_possibles:
+            aventurier = random.choice(aventuriers_possibles)
+            return aventurier
+        else:
+            return None
 
     def afficher_bonus(self, aventurier):
         if aventurier == Barbare:
@@ -289,7 +296,6 @@ elif isinstance(joueur, Analyste):
     joueur = Analyste(nom_joueur, difficulte)
 
 print("\nVoici vos nouvelles statistiques avec la difficulté :", difficulte.nom)
-joueur.afficher_stats()
 
 # Création du donjon
 donjon = Donjon()
