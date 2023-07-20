@@ -1,7 +1,5 @@
 import random
 from equipements import BarbareEquipement, HealerEquipement, AnalysteEquipement
-# Les importations de "salle.py" sont déplacées à l'intérieur des fonctions / méthodes qui en ont besoin.
-# Cela évite l'importation circulaire.
 
 class Joueur:
     def __init__(self, nom, classe, equipement, difficulte):

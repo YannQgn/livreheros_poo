@@ -2,7 +2,6 @@ from salle import Donjon
 from personage import Joueur
 from equipements import BarbareEquipement, HealerEquipement, AnalysteEquipement
 from difficultes import DifficulteInconnue, Facile, Moyen, Difficile, Hardcore
-from salle import Salle, SallePieges, SalleTresor, SalleCombat
 
 def jouer():
 
