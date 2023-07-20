@@ -134,6 +134,57 @@ class SalleCombat(Salle):
 
         print("")
 
+
+
+class SalleFeuDeCamp(Salle):
+    def __init__(self, nom, description):
+        super().__init__(nom, description)
+
+    def rencontrer_aventurier(self, joueur):
+        aventuriers_possibles = [Barbare, Healer, Analyste]
+        if isinstance(joueur, Healer):
+            # Si le joueur est un Healer, on exclut la possibilité de rencontrer un autre Healer
+            aventuriers_possibles.remove(Healer)
+        aventurier = random.choice(aventuriers_possibles)
+        return aventurier
+
+    def afficher_bonus(self, aventurier):
+        if aventurier == Barbare:
+            print("Le Barbare vous donne un bonus d'attaque !")
+        elif aventurier == Healer:
+            print("Le Healer vous soigne et vous donne un bonus de vie !")
+        elif aventurier == Analyste:
+            print("L'Analyste vous donne un bonus de défense et de chance de critique !")
+
+    def entrer(self, joueur):
+        print("\nVous entrez dans la salle :", self.nom)
+        print(self.description)
+
+        # Implémentez la logique spécifique à la salle de feu de camp
+        aventurier_rencontre = self.rencontrer_aventurier(joueur)
+
+        # Afficher le personnage rencontré
+        if aventurier_rencontre == Barbare:
+            print("Vous rencontrez un Barbare !")
+        elif aventurier_rencontre == Healer:
+            print("Vous rencontrez un Healer !")
+        elif aventurier_rencontre == Analyste:
+            print("Vous rencontrez un Analyste !")
+
+        # Traiter le bonus en fonction du personnage rencontré
+        self.afficher_bonus(aventurier_rencontre)
+
+        # Appliquer le bonus au joueur
+        if isinstance(aventurier_rencontre, Barbare):
+            joueur.points_dattaque += 5
+        elif isinstance(aventurier_rencontre, Healer):
+            joueur.points_de_vie += 20
+        elif isinstance(aventurier_rencontre, Analyste):
+            joueur.points_de_defense += 5
+            joueur.chance_de_crit += 10
+
+        print("")
+
 class Donjon:
     def __init__(self):
         self.salles = []
@@ -147,6 +198,7 @@ class Donjon:
             Salle("Salle des pièges", "Vous êtes entouré de pièges mortels."),
             Salle("Salle du trésor", "Vous trouvez un trésor rempli de richesses."),
             Salle("Salle du combat", "Un monstre redoutable vous attaque !"),
+            SalleFeuDeCamp("Salle feu de camp", "Vous rencontrez un aventurier."),
             # ... Ajoutez d'autres salles selon vos besoins
         ]
 
@@ -169,7 +221,12 @@ class Donjon:
     def explorer(self, joueur):
         for salle in self.salles:
             choix_direction = joueur.choisir_direction()
-            joueur.entrer_salle(salle)
+
+            # Vérifier si la salle est une SalleFeuDeCamp pour appeler sa méthode entrer() spécifique
+            if isinstance(salle, SalleFeuDeCamp):
+                salle.entrer(joueur)
+            else:
+                joueur.entrer_salle(salle)
 
 # Exemple d'utilisation
 nom_joueur = input("Entrez votre nom: ")
