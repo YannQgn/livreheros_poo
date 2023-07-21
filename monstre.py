@@ -12,6 +12,10 @@ class Monstre:
 
 
 class Potion:
-    def __init__(self, nom,valeur):
+    def __init__(self, nom,type_potion,valeur):
         self.nom = nom
+        self.type_potion=type_potion
         self.valeur = valeur 
+    def __str__(self):
+        return f"Nom : {self.nom}, type: {self.type_potion}, valeur: {self.valeur}"
+
