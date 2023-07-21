@@ -9,13 +9,3 @@ class Monstre:
         self.chance_de_crit = chance_de_crit
     def __str__(self):
         return f"Nom : {self.nom}, Classe : {self.classe}, Points de vie : {self.points_de_vie}, Points d'attaque : {self.points_dattaque}, Points de défense : {self.points_de_defense}, Chance de coup critique : {self.chance_de_crit}"
-
-
-class Potion:
-    def __init__(self, nom,type_potion,valeur):
-        self.nom = nom
-        self.type_potion=type_potion
-        self.valeur = valeur 
-    def __str__(self):
-        return f"Nom : {self.nom}, type: {self.type_potion}, valeur: {self.valeur}"
-

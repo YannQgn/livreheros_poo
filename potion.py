@@ -1,7 +1,8 @@
 class Potion:
-    def __init__(self, nom, random_bonus):
+    def __init__(self, nom,type_potion,valeur):
         self.nom = nom
-        self.random_bonus = random_bonus
+        self.type_potion=type_potion
+        self.valeur = valeur 
 
     def utiliser(self, joueur,bonus_type):
         match bonus_type:
@@ -15,4 +16,4 @@ class Potion:
                 joueur.chance_de_crit += self.random_bonus
 
     def __str__(self):
-        return self.nom
+        return f"Nom : {self.nom}, type: {self.type_potion}, valeur: {self.valeur}"

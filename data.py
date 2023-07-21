@@ -1,6 +1,6 @@
 from connection import Connexion
-from monstre import Monstre,Potion
-
+from monstre import Monstre
+from potion import Potion
 class Data :
 
     def get_monstre_bdd(self,id) :
