@@ -1,5 +1,13 @@
 import random
+import random
+import torch
+from connection import Connexion
 from potion import Potion
+from api_gpt import API_GPT
+
+# Ajouter la constante PROMPT_DONJON pour définir le contexte de l'aventure
+PROMPT_DONJON = "Dans un univers médiéval fantastique, vous êtes un aventurier courageux qui rêve de devenir riche. Vous décidez de parcourir un donjon mystérieux dans l'espoir de trouver des trésors cachés et de l'argent. Vous vous trouvez actuellement dans une salle du donjon."
+
 class Salle:
     def __init__(self, nom, description):
         self.nom = nom
@@ -11,25 +19,6 @@ class Salle:
     def entrer(self, joueur):
         print("\nVous entrez dans la salle :", self.nom)
         print(self.description)
-
-    def __potion_random__(self,joueur,pourcentage):
-        # par exemple: 0.3 = 30% de chances de trouver une potion
-        if random.random() < pourcentage :           
-            liste_bonus = ["bonus_attaque","bonus_vie","bonus_defense","bonus_chance_critique"]
-            random_bonus = random.choice(liste_bonus)
-            chiffre_random = 0
-            match random_bonus:
-                case "bonus_attaque":
-                    chiffre_random = random.randint(5,15)
-                case "bonus_vie":
-                    chiffre_random = random.randint(10,30)
-                case "bonus_defense":
-                    chiffre_random = random.randint(2,10)
-                case "bonus_chance_critique":
-                    chiffre_random = random.randint(1,10)          
-            potion = Potion("Potion magique",random_bonus=chiffre_random)
-            print(f"Vous trouvez une potion magique de {random_bonus} qui vous augmente de {chiffre_random} points.")
-            potion.utiliser(joueur, bonus_type=random_bonus)
 
 class SallePieges(Salle):
     def __init__(self, nom, description):
@@ -47,7 +36,6 @@ class SallePieges(Salle):
                 joueur.points_de_vie -= 10
         else:
             print("Vous décidez de contourner prudemment les pièges.")
-        super().__potion_random__(joueur,random.random() < 0.3)
         print("")
 
 class SalleTresor(Salle):
@@ -63,7 +51,6 @@ class SalleTresor(Salle):
             print(f"Vous trouvez un coffre rempli de richesses ! Votre attaque augmente de {tresor} points.")
         else:
             print("Vous décidez de ne pas ouvrir le coffre.")
-        super().__potion_random__(joueur,random.random() < 0.3)
         print("")
 
 class SalleFeuDeCamp(Salle):
@@ -124,64 +111,212 @@ class SalleFeuDeCamp(Salle):
         elif isinstance(aventurier_rencontre, Analyste):
             joueur.points_de_defense += 5
             joueur.chance_de_crit += 10
-        super().__potion_random__(joueur,random.random() < 0.3)
+
         print("")
 
 class SalleCombat(Salle):
     def __init__(self, nom, description):
         super().__init__(nom, description)
 
+    def choisir_monstre_aleatoire(self):
+        conn = Connexion.connecter()  # Utiliser la méthode de connexion pour récupérer l'objet de connexion
+        cursor = conn.cursor()  # Récupérer un curseur à partir de l'objet de connexion
+
+        cursor.execute("SELECT * FROM monstre WHERE id <> 3 ORDER BY RAND() LIMIT 1")
+        monstre_data = cursor.fetchone()
+        monstre = {
+            "nom": monstre_data[1],
+            "classe": monstre_data[2],
+            "points_de_vie": monstre_data[3],
+            "points_dattaque": monstre_data[4],
+            "points_de_defense": monstre_data[5],
+            "chance_de_crit": monstre_data[6]
+        }
+
+        cursor.close()
+        Connexion.deconnecter()  # Utiliser la méthode deconnexion pour fermer le curseur et la connexion
+
+        return monstre
+
     def entrer(self, joueur):
         print("\nVous entrez dans la salle :", self.nom)
         print(self.description)
-        # Implémentez la logique spécifique à la salle de combat
-        ennemi = "Dragon"  # Remplacez par le nom de l'ennemi approprié
-        print(f"Un {ennemi} redoutable vous attaque !")
-        choix = input("Voulez-vous combattre l'ennemi ? (Oui/Non) : ")
+
+        monstre = self.choisir_monstre_aleatoire()
+
+        print(f"Un {monstre['nom']} vous attaque !")
+
+        choix = input("Voulez-vous combattre le monstre ? (Oui/Non) : ")
         if choix.lower() == "oui":
             reussite = random.random() < 0.7  # 70% de chance de réussite
             if reussite:
-                print(f"Bravo ! Vous avez vaincu le {ennemi}.")
+                print(f"Bravo ! Vous avez vaincu le {monstre['nom']}.")
             else:
-                print(f"Le {ennemi} était trop puissant pour vous. Vous subissez des dégâts.")
+                print(f"Le {monstre['nom']} était trop puissant pour vous. Vous subissez des dégâts.")
                 joueur.points_de_vie -= 30
         else:
             print("Vous décidez de fuir le combat.")
-        super().__potion_random__(joueur,random.random() < 0.3)
+
         print("")
+
+class SalleBoss(SalleCombat):
+    def __init__(self, nom, description):
+        super().__init__(nom, description)
+
+    def choisir_monstre_fixe(self):
+        conn = Connexion.connecter()  # Utiliser la méthode de connexion pour récupérer le curseur
+
+        # Sélectionner le monstre avec l'ID 3 (monstre3) dans la base de données
+        conn.execute("SELECT * FROM monstre WHERE id = 3")
+        monstre_data = conn.fetchone()
+        monstre = {
+            "nom": monstre_data[1],
+            "classe": monstre_data[2],
+            "points_de_vie": monstre_data[3],
+            "points_dattaque": monstre_data[4],
+            "points_de_defense": monstre_data[5],
+            "chance_de_crit": monstre_data[6]
+        }
+
+        conn.close()
+        Connexion.deconnecter()  # Utiliser la méthode deconnexion pour fermer la connexion
+
+        return monstre
+
+    def entrer(self, joueur):
+        print(super().__str__())  # Utiliser la méthode __str__ pour afficher le nom spécifique de la salle
+        boss = "Stephane Le Dévoreur d'espoir"  # Nom du boss, vous pouvez le personnaliser
+        print(f"Un {boss} terrifiant vous attaque !")
+
+        while True:
+            choix = input("Voulez-vous combattre le boss ? (Oui/Non) : ")
+            if choix.lower() == "oui":
+                reussite = random.random() < 0.3  # 30% de chance de réussite contre le boss
+                if reussite:
+                    print(f"Félicitations ! Vous avez vaincu le {boss}. Vous avez gagné le jeu !")
+                    break
+                else:
+                    print(f"Le {boss} Attaque pédagogie ACTIVE. Vous subissez de lourds dégâts.")
+                    joueur.points_de_vie -= 70
+                    if joueur.points_de_vie <= 0:
+                        print("Vous êtes mort. Game Over.")
+                        break
+            else:
+                print("Vous ne pouvez pas fuir le combat contre le boss. Vous devez combattre !")
+
+        print("")
+
+class SallePotion(Salle):
+    def __init__(self, nom, description):
+        super().__init__(nom, description)
+        self.potion = None
+
+    def generer_potion(self):
+        conn = Connexion.connecter()
+        cursor = conn.cursor()
+
+        # Modifier la requête SQL pour récupérer spécifiquement la potion "Le_Graal"
+        cursor.execute("SELECT * FROM potion WHERE nom='Le_Graal' LIMIT 1")
+        potion_data = cursor.fetchone()
+
+        if potion_data:
+            self.potion = Potion(potion_data[1], potion_data[2], potion_data[3])
+
+        cursor.close()
+        Connexion.deconnecter()
+
+class SallePotion(Salle):
+    def __init__(self, nom, description):
+        super().__init__(nom, description)
+        self.potion = None
+
+    def generer_potion(self):
+        conn = Connexion.connecter()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM potion ORDER BY RAND() LIMIT 1")
+        potion_data = cursor.fetchone()
+
+        if potion_data:
+            self.potion = Potion(potion_data[1], potion_data[2], potion_data[3])
+
+        cursor.close()
+        Connexion.deconnecter()
+
+    def entrer(self, joueur):
+        print("\nVous entrez dans la salle :", self.nom)
+        print(self.description)
+
+        self.generer_potion()
+
+        if self.potion:
+            print(f"Vous trouvez une potion : {self.potion.nom}")
+            choix = input("Voulez-vous utiliser la potion ? (Oui/Non) : ")
+            if choix.lower() == "oui":
+                self.potion.utiliser(joueur)
+                if self.potion.type_potion == "Le_Graal":
+                    joueur.points_de_vie = 0
+                    print("Vous buvez la potion Le_Graal... Vous êtes mort.")
+                    print("Game Over.")
+                    return  # Quit the game if the player is dead
+            else:
+                print("Vous décidez de ne pas utiliser la potion.")
+
+        else:
+            print("Vous explorez la salle mais ne trouvez aucune potion.")
+
+        # Check if the player is still alive after using another potion
+        if joueur.points_de_vie <= 0:
+            print("Vous êtes mort. Game Over.")
+            return  # Quit the game if the player is dead
+
+        print("")
+
 
 class Donjon:
     def __init__(self):
         self.salles = []
+        self.difficulte = None
+        self.nombre_salles = 0
 
     def ajouter_salle(self, salle):
         self.salles.append(salle)
 
-    def generer_salles(self, difficulte, nombre_salles):
+    def generer_salles(self):
         # Liste des salles disponibles
         liste_salles = [
             SallePieges("Salle des pièges", "Vous êtes entouré de pièges mortels."),
             SalleTresor("Salle du trésor", "Vous trouvez un trésor rempli de richesses."),
             SalleFeuDeCamp("Salle feu de camp", "Vous rencontrez un aventurier."),
-            SalleCombat ("Salle des montres", "Vous tombé sur un groupe de monstre")
+            SalleCombat ("Salle des monstres", "Vous tombez sur un groupe de monstres"),
+            SallePotion ("Salle des potion" , "Vous tombez dans une salle rempli de potion bizarre")
             # Ajouter d'autres salles selon vos besoins
         ]
 
         # Vérifie si le nombre de salles demandé est supérieur à la taille de la liste
-        if nombre_salles > len(liste_salles):
-            nombre_salles = len(liste_salles)
+        if self.nombre_salles > len(liste_salles):
+            self.nombre_salles = len(liste_salles)
 
         # Mélange aléatoire des salles
         random.shuffle(liste_salles)
 
         # Sélection des salles en fonction de la difficulté et du nombre de salles requis
-        for i in range(nombre_salles - 1):
+        for i in range(self.nombre_salles - 1):
             salle = liste_salles[i]
             self.ajouter_salle(salle)
 
         # Ajout de la salle du Boss
-        salle_boss = Salle("Salle du Boss", "Un boss redoutable vous attend !")
+        salle_boss = SalleBoss("Salle du Boss", "Un boss redoutable vous attend !")
         self.ajouter_salle(salle_boss)
+
+    def obtenir_description_environnement(self, coordonnees_personnage):
+        latitude, longitude = coordonnees_personnage
+
+        # Générer une description en utilisant GPT-3.5
+        query = PROMPT_DONJON
+        description = API_GPT.demande_GPT(query)
+
+        return description
 
     def explorer(self, joueur):
         for salle in self.salles:

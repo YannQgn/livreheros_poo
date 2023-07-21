@@ -86,7 +86,7 @@ class Analyste(Joueur):
         super().__init__(nom, "Analyste", equipement, difficulte)
         self.points_de_vie -= 10
         self.points_dattaque += 7
-        self.chance_de_crit += 25
+        self.chance_de_crit += 15
 
     def choisir_direction(self):
         print("Choisissez une direction :")
